@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import type { TableColumnsType } from 'antd';
-import { Divider, Radio, Space, Dropdown,  Table, Button, Tag, Flex, Typography } from 'antd';
+import { Divider, Radio, Switch, Space, Dropdown,  Table, Button, Tag, Flex, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import './App.css';
 
@@ -111,7 +111,7 @@ function App() {
   useEffect(() => {
     setLoading(false);
     
-  }, [dataSource])
+  }, [dataSource, selectedRowKeys])
 
   const start = () => {
     setLoading(true);
@@ -148,6 +148,36 @@ function App() {
     
 
 };
+const selectAllRows = () => {
+  const allKeys = dataSource.map(item => item.key);
+  setSelectedRowKeys(allKeys);
+
+  const result = calculateAgeSum(dataSource, allKeys);
+  setSelectedCount(allKeys.length);
+
+  setSelectedAmount(result);
+
+  if(allKeys.length == 0) {
+    setSelectedSome(false);
+  } else {
+    setSelectedSome(true);
+  }
+};
+
+const clearAll = () => {
+  setSelectedRowKeys([]);
+
+  const result = calculateAgeSum(dataSource, []);
+  setSelectedCount([].length);
+
+  setSelectedAmount(result);
+
+  if([].length == 0) {
+    setSelectedSome(false);
+  } else {
+    setSelectedSome(true);
+  }
+};
 
 
   
@@ -162,8 +192,7 @@ function App() {
     setSelectedCount(newSelectedRowKeys.length);
 
     setSelectedAmount(result);
-    console.log("Сумма возрастов:", result);
-    console.log("Сумма возрастов:", result);
+
     if(newSelectedRowKeys.length == 0) {
       setSelectedSome(false);
     } else {
@@ -210,35 +239,17 @@ function App() {
     <div className="App">
 
 
-      <div style={{ maxWidth: "1000px", margin: "40px auto"}}>
-        <div style={{}}>
+      <div style={{ maxWidth: "1000px", margin: "40px auto 20px auto"}}>
+        <div>
           <Flex vertical align='flex-start'>        <h1>{selectedCount} payments to send</h1>
-          <Text>{selectedCount} out of {data.length} transactions are marked to execute and will be sent</Text></Flex>          
+          </Flex>          
         </div>
 
-      <div style={{ marginTop: "100px", height: "30px"}}>
-      <Flex gap={20} justify='flex-end'>
-        
-        {selectedSome && 
-        <Dropdown
-        menu={{
-          items,
-        }}
-        placement="bottomLeft"
-      >
-        <Button >Set wallet</Button>
-      </Dropdown>
-        }
-        {isChanged && <Button onClick={() => {setDataSource(data); setIsChanged(false)}}>Reset changes</Button>}
-        
-        </Flex>
-        
 
-      </div>
 
 
         { !loading && <Table  scroll={{
-      y: 600,
+      y: '50vh',
     }}   expandable={{
       expandedRowRender: (record) => (
         <p
@@ -251,20 +262,44 @@ function App() {
           Reference: {record.reference}
         </p>
       ),
-    }}    pagination={false} style={{borderRadius: '8px', margin: '20px 0 140px 0', border: '1px solid #d1cfd5'}} 
+    }}    pagination={false} style={{borderRadius: '8px', margin: '20px 0 20px 0', border: '1px solid #d1cfd5'}} 
     rowSelection={rowSelection} columns={columns} dataSource={dataSource} />}
+      <Flex gap={16} justify='space-between'>
+        <Space>
+          <Button onClick={selectAllRows}>Select all transactions</Button>
+          {hasSelected && <Button onClick={clearAll}>Clear all</Button> }          
+        </Space>
+
+        <Space>
+        {selectedSome && 
+        <Dropdown
+        menu={{
+          items,
+        }}
+        placement="bottomLeft"
+      >
+        <Button >Set wallet</Button>
+      </Dropdown>
+        }
+        {isChanged && <Button onClick={() => {setDataSource(data); setIsChanged(false)}}>Reset changes</Button>}
+        </Space>
+
+              
+      </Flex>
 
 
       </div>
 
-      <div style={{ height: "100px", width: "100%", backgroundColor: "white", position: "fixed", bottom: "0", left: "0"}}>
-        <Flex justify='flex-end' gap={20} align='center' style={{maxWidth: "1000px", margin: "10px auto"}}>
-          <h3>{selectedAmount} EUR</h3>
-          <Button onClick={() => {alert(selectedAmount)}} type="primary">Confirm {selectedCount} payments</Button>
-        </Flex>
-        
+      
+            
+            <Flex vertical gap={12} align='flex-start'  style={{maxWidth: "1000px", margin: "10px auto"}}>
+            <Text>{selectedCount} out of {data.length} transactions are marked to execute and will be sent</Text>
+              <h3>{selectedAmount} EUR</h3>
+              <Button onClick={() => {alert(selectedAmount)}} type="primary">Confirm {selectedCount} payments</Button>
+            </Flex>          
+            
 
-      </div>
+      
 
     </div>
   );
