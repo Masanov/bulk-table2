@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import type { TableColumnsType } from 'antd';
 import { Divider, Radio, Switch, Space, Dropdown,  Table, Button, Tag, Flex, Typography } from 'antd';
 import type { TableProps } from 'antd';
+import { SelectExecute } from './selectExecute';
 import './App.css';
 
 const { Text } = Typography;
@@ -34,6 +35,16 @@ const columns = [
     dataIndex: 'age',
   },
   {
+    title: 'Execute',
+    dataIndex: 'execute',
+    render: (_, record) => (
+      <Switch size="small" defaultChecked />
+        
+      
+    ),
+  },
+
+  {
     title: 'Wallet',
     dataIndex: 'wallet',
     filters: [
@@ -63,6 +74,7 @@ for (let i = 0; i < 5; i++) {
     key: i,
     recipient: `NexaWave`,
     age: 250,
+    execute: true,
     wallet: 'Main',
     address: `IBAN: HR43 4355 4664 4455 ${i}`,
     reference: 'Some refrerence text'
@@ -73,6 +85,7 @@ for (let i = 5; i < 10; i++) {
     key: i,
     recipient: `Microsoft`,
     age: 250,
+    execute: true,
     wallet: 'Main',
     address: `IBAN: HR43 4355 4664 4455 ${i}`,
     reference: 'Some refrerence text'
@@ -83,6 +96,7 @@ for (let i = 11; i < 14; i++) {
     key: i,
     recipient: `Salary Fond`,
     age: 200,
+    execute: true,
     wallet: 'Salary',
     address: `IBAN: HR43 4355 4664 4455 ${i}`,
     reference: 'some text'
@@ -93,6 +107,7 @@ for (let i = 16; i < 20; i++) {
     key: i,
     recipient: `Goverment fond`,
     age: 300,
+    execute: true,
     wallet: 'Taxes',
     address: `IBAN: HR43 4355 4664 4455 ${i}`,
     reference: 'some text'
@@ -148,6 +163,23 @@ function App() {
     
 
 };
+
+async function updateExecution(data, keys, newState) {
+  const updatedData = data.map(obj => {
+      if (keys.includes(obj.key)) {
+          return { ...obj, execute: newState };
+      } else {
+          return obj;
+      }
+  });
+
+  
+  setDataSource(updatedData);
+  setIsChanged(true);
+  
+
+};
+
 const selectAllRows = () => {
   const allKeys = dataSource.map(item => item.key);
   setSelectedRowKeys(allKeys);
@@ -206,6 +238,9 @@ const clearAll = () => {
   };
   const hasSelected = selectedRowKeys.length > 0;
 
+
+
+
   const items = [
     {
       key: '1',
@@ -222,7 +257,7 @@ const clearAll = () => {
           Salary
         </span>
       ),
-    },
+    }
     ,
     {
       key: '3',
@@ -234,6 +269,7 @@ const clearAll = () => {
     }
     
   ];
+
 
   return (
     <div className="App">
@@ -271,7 +307,7 @@ const clearAll = () => {
         </Space>
 
         <Space>
-        {selectedSome && 
+        {selectedSome && <>
         <Dropdown
         menu={{
           items,
@@ -280,6 +316,9 @@ const clearAll = () => {
       >
         <Button >Set wallet</Button>
       </Dropdown>
+      <SelectExecute />
+              
+            </>
         }
         {isChanged && <Button onClick={() => {setDataSource(data); setIsChanged(false)}}>Reset changes</Button>}
         </Space>
@@ -294,7 +333,7 @@ const clearAll = () => {
             
             <Flex vertical gap={12} align='flex-start'  style={{maxWidth: "1000px", margin: "10px auto"}}>
             <Text>{selectedCount} out of {data.length} transactions are marked to execute and will be sent</Text>
-              <h3>{selectedAmount} EUR</h3>
+              <h3 style={{margin: '4px'}}>{selectedAmount} EUR</h3>
               <Button onClick={() => {alert(selectedAmount)}} type="primary">Confirm {selectedCount} payments</Button>
             </Flex>          
             
